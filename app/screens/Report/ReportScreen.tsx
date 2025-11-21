@@ -3,19 +3,21 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Switch,
   Text,
   Pressable,
   Modal,
   FlatList,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { ScreenContainer } from '../../../components/ScreenContainer';
 import { TitleText } from '../../../components/text/TitleText';
 import { RoundedButton } from '../../../components/button/RoundedButton';
 import { InputField } from '../../../components/InputField';
-import { BackButton } from '../../../components/button/BackButton';
-import { ReportStep } from '../../../types';
-import { Bodytext } from '../../../components/text/BodyText';
+import { FixedBackButton } from '../../../components/button/FixedBackButton';
+import { ReportStep, ReportData } from '../../../types';
+import { BodyText } from '../../../components/text/BodyText';
+import { saveReport } from '../../../lib/supabaseService';
 
 const genders = ['Эрэгтэй', 'Эмэгтэй'];
 
@@ -32,6 +34,7 @@ export function ReportScreen() {
   const [age, setAge] = useState<string>('');
   const [school, setSchool] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleBack = () => {
     if (step > 1) {
@@ -55,234 +58,287 @@ export function ReportScreen() {
     }
   };
 
+  const handleSubmit = async () => {
+    if (!moodLevel || !actionType || !location || !role) {
+      Alert.alert('Алдаа', 'Бүх талбарыг бөглөнө үү');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const reportData: ReportData = {
+        moodLevel,
+        actionType,
+        location,
+        role,
+        gender,
+        age,
+        school,
+        phone,
+      };
+
+      await saveReport(reportData);
+      Alert.alert('Амжилттай', 'Таны мэдээлэл амжилттай илгээгдлээ', [
+        {
+          text: 'OK',
+          onPress: () => {
+            setStep(1);
+            setMoodLevel(null);
+            setActionType(null);
+            setLocation(null);
+            setRole(null);
+            setGender('');
+            setAge('');
+            setSchool('');
+            setPhone('');
+          },
+        },
+      ]);
+    } catch (error) {
+      Alert.alert(
+        'Алдаа',
+        'Мэдээлэл илгээхэд алдаа гарлаа. Дахин оролдоно уу.'
+      );
+      console.error('Error submitting report:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <ScreenContainer scrollable>
-      {step > 1 && <BackButton onPress={handleBack} />}
+    <>
+      {step > 1 && <FixedBackButton onPress={handleBack} />}
+      <ScreenContainer scrollable>
 
-      {step === 1 && (
-        <View style={styles.stepContainer}>
-          <TitleText>Та мэдээллэх үү?</TitleText>
-          <RoundedButton
-            label="Мэдээлэх"
-            onPress={handleNext}
-            color="pink"
-            size="large"
-            style={styles.largeCircleButton}
-          />
-        </View>
-      )}
-
-      {step === 2 && (
-        <View style={styles.stepContainer}>
-          <TitleText>Сэтгэлийн байдал</TitleText>
-          <View style={styles.moodGuideContainer}>
-            <Bodytext center={false}>Хөнгөн 1</Bodytext>
-            <Bodytext center={false}>Хүнд 5</Bodytext>
+        {step === 1 && (
+          <View style={styles.stepContainer}>
+            <TitleText>Та мэдээллэх үү?</TitleText>
+            <RoundedButton
+              label="Мэдээлэх"
+              onPress={handleNext}
+              color="pink"
+              size="large"
+              style={styles.largeCircleButton}
+            />
           </View>
-          <View style={styles.moodButtonsContainer}>
-            {[1, 2, 3, 4, 5].map((level) => (
+        )}
+
+        {step === 2 && (
+          <View style={styles.stepContainer}>
+            <TitleText>Сэтгэлийн байдал</TitleText>
+            <View style={styles.moodGuideContainer}>
+              <BodyText center={false}>Хөнгөн 1</BodyText>
+              <BodyText center={false}>Хүнд 5</BodyText>
+            </View>
+            <View style={styles.moodButtonsContainer}>
+              {[1, 2, 3, 4, 5].map((level) => (
+                <RoundedButton
+                  key={level}
+                  label={level.toString()}
+                  onPress={() => {
+                    setMoodLevel(level);
+                    handleNext();
+                  }}
+                  color={
+                    level === 1
+                      ? 'mint'
+                      : level === 2
+                        ? 'blue'
+                        : level === 3
+                          ? 'yellow'
+                          : level === 4
+                            ? 'pink'
+                            : 'darkBlue'
+                  }
+                  style={styles.moodButton}
+                />
+              ))}
+            </View>
+          </View>
+        )}
+
+        {step === 3 && (
+          <View style={styles.stepContainer}>
+            <TitleText>Ямар төрлийн булли?</TitleText>
+            <View style={styles.buttonColumn}>
               <RoundedButton
-                key={level}
-                label={level.toString()}
+                label="Утcаар"
                 onPress={() => {
-                  setMoodLevel(level);
+                  setActionType('verbal');
                   handleNext();
                 }}
-                color={
-                  level === 1
-                    ? 'mint'
-                    : level === 2
-                    ? 'blue'
-                    : level === 3
-                    ? 'yellow'
-                    : level === 4
-                    ? 'pink'
-                    : 'darkBlue'
-                }
-                style={styles.moodButton}
+                color="pink"
+                size="large"
               />
-            ))}
-          </View>
-        </View>
-      )}
-
-      {step === 3 && (
-        <View style={styles.stepContainer}>
-          <TitleText>Ямар төрлийн булли?</TitleText>
-          <View style={styles.buttonColumn}>
-            <RoundedButton
-              label="Утcаар"
-              onPress={() => {
-                setActionType('verbal');
-                handleNext();
-              }}
-              color="pink"
-              size="large"
-            />
-            <RoundedButton
-              label="Биед халдах"
-              onPress={() => {
-                setActionType('physical');
-                handleNext();
-              }}
-              color="mint"
-              size="large"
-            />
-            <RoundedButton
-              label="Цахим"
-              onPress={() => {
-                setActionType('cyber');
-                handleNext();
-              }}
-              color="blue"
-              size="large"
-            />
-          </View>
-        </View>
-      )}
-
-      {step === 4 && (
-        <View style={styles.stepContainer}>
-          <TitleText>Хаана болсон вэ?</TitleText>
-          <View style={styles.buttonColumn}>
-            <RoundedButton
-              label="Сургууль"
-              onPress={() => {
-                setLocation('school');
-                handleNext();
-              }}
-              color="yellow"
-              size="large"
-            />
-            <RoundedButton
-              label="Гудамж"
-              onPress={() => {
-                setLocation('street');
-                handleNext();
-              }}
-              color="pink"
-              size="large"
-            />
-            <RoundedButton
-              label="Гэр бүл"
-              onPress={() => {
-                setLocation('family');
-                handleNext();
-              }}
-              color="blue"
-              size="large"
-            />
-            <RoundedButton
-              label="Олон нийтийн газар"
-              onPress={() => {
-                setLocation('public');
-                handleNext();
-              }}
-              color="mint"
-              size="large"
-            />
-          </View>
-        </View>
-      )}
-
-      {step === 5 && (
-        <View style={styles.stepContainer}>
-          <TitleText>Та хэн бэ?</TitleText>
-          <View style={styles.buttonColumn}>
-            <RoundedButton
-              label="Хүүхэд"
-              onPress={() => {
-                setRole('child');
-                handleNext();
-              }}
-              color="blue"
-              size="large"
-            />
-            <RoundedButton
-              label="Мэдээлэгч"
-              onPress={() => {
-                setRole('reporter');
-                handleNext();
-              }}
-              color="mint"
-              size="large"
-            />
-          </View>
-        </View>
-      )}
-
-      {step === 6 && (
-        <View style={styles.stepContainer}>
-          <TitleText>Хувийн мэдээлэл</TitleText>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <Pressable style={styles.inputBox} onPress={() => setVisible(true)}>
-              <Text style={styles.inputText}>
-                {gender ? gender : 'Хүйс сонгох'}
-              </Text>
-            </Pressable>
-            <Modal transparent visible={visible} animationType="fade">
-              <Pressable
-                style={styles.overlay}
+              <RoundedButton
+                label="Биед халдах"
                 onPress={() => {
-                  setVisible(false);
+                  setActionType('physical');
+                  handleNext();
                 }}
-              >
-                <View style={styles.modalBox}>
-                  <FlatList
-                    data={genders}
-                    keyExtractor={(item) => item}
-                    renderItem={({ item }) => (
-                      <Pressable
-                        style={styles.option}
-                        onPress={() => {
-                          setGender(item);
-                          setVisible(false);
-                        }}
-                      >
-                        <Text style={styles.optionText}>{item}</Text>
-                      </Pressable>
-                    )}
-                  />
-                </View>
+                color="mint"
+                size="large"
+              />
+              <RoundedButton
+                label="Цахим"
+                onPress={() => {
+                  setActionType('cyber');
+                  handleNext();
+                }}
+                color="blue"
+                size="large"
+              />
+            </View>
+          </View>
+        )}
+
+        {step === 4 && (
+          <View style={styles.stepContainer}>
+            <TitleText>Хаана болсон вэ?</TitleText>
+            <View style={styles.buttonColumn}>
+              <RoundedButton
+                label="Сургууль"
+                onPress={() => {
+                  setLocation('school');
+                  handleNext();
+                }}
+                color="yellow"
+                size="large"
+              />
+              <RoundedButton
+                label="Гудамж"
+                onPress={() => {
+                  setLocation('street');
+                  handleNext();
+                }}
+                color="pink"
+                size="large"
+              />
+              <RoundedButton
+                label="Гэр бүл"
+                onPress={() => {
+                  setLocation('family');
+                  handleNext();
+                }}
+                color="blue"
+                size="large"
+              />
+              <RoundedButton
+                label="Олон нийтийн газар"
+                onPress={() => {
+                  setLocation('public');
+                  handleNext();
+                }}
+                color="mint"
+                size="large"
+              />
+            </View>
+          </View>
+        )}
+
+        {step === 5 && (
+          <View style={styles.stepContainer}>
+            <TitleText>Та хэн бэ?</TitleText>
+            <View style={styles.buttonColumn}>
+              <RoundedButton
+                label="Хүүхэд"
+                onPress={() => {
+                  setRole('child');
+                  handleNext();
+                }}
+                color="blue"
+                size="large"
+              />
+              <RoundedButton
+                label="Мэдээлэгч"
+                onPress={() => {
+                  setRole('reporter');
+                  handleNext();
+                }}
+                color="mint"
+                size="large"
+              />
+            </View>
+          </View>
+        )}
+
+        {step === 6 && (
+          <View style={styles.stepContainer}>
+            <TitleText>Хувийн мэдээлэл</TitleText>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Pressable style={styles.inputBox} onPress={() => setVisible(true)}>
+                <Text style={styles.inputText}>
+                  {gender ? gender : 'Хүйс сонгох'}
+                </Text>
               </Pressable>
-            </Modal>
+              <Modal transparent visible={visible} animationType="fade">
+                <Pressable
+                  style={styles.overlay}
+                  onPress={() => {
+                    setVisible(false);
+                  }}
+                >
+                  <View style={styles.modalBox}>
+                    <FlatList
+                      data={genders}
+                      keyExtractor={(item) => item}
+                      renderItem={({ item }) => (
+                        <Pressable
+                          style={styles.option}
+                          onPress={() => {
+                            setGender(item);
+                            setVisible(false);
+                          }}
+                        >
+                          <Text style={styles.optionText}>{item}</Text>
+                        </Pressable>
+                      )}
+                    />
+                  </View>
+                </Pressable>
+              </Modal>
 
-            <InputField
-              label="Нас"
-              placeholder="Насаа оруулна уу"
-              value={age}
-              onChangeText={setAge}
-              keyboardType="numeric"
-            />
+              <InputField
+                label="Нас"
+                placeholder="Насаа оруулна уу"
+                value={age}
+                onChangeText={setAge}
+                keyboardType="numeric"
+              />
 
-            <InputField
-              label="Сургууль"
-              placeholder="Сургуулийн нэр"
-              value={school}
-              onChangeText={setSchool}
-            />
+              <InputField
+                label="Сургууль"
+                placeholder="Сургуулийн нэр"
+                value={school}
+                onChangeText={setSchool}
+              />
 
-            <InputField
-              label="Утас"
-              placeholder="Утасны дугаар"
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-            />
+              <InputField
+                label="Утас"
+                placeholder="Утасны дугаар"
+                value={phone}
+                onChangeText={setPhone}
+                keyboardType="phone-pad"
+              />
 
-            <RoundedButton
-              label="Илгээх"
-              onPress={() => {
-                console.log('Report submitted');
-              }}
-              color="darkBlue"
-              size="large"
-              style={{ marginTop: 20 }}
-            />
-          </ScrollView>
-        </View>
-      )}
-    </ScreenContainer>
+              <RoundedButton
+                label={isSubmitting ? 'Илгээж байна...' : 'Илгээх'}
+                onPress={handleSubmit}
+                color="darkBlue"
+                size="large"
+                style={{ marginTop: 20, opacity: isSubmitting ? 0.6 : 1 }}
+                disabled={isSubmitting}
+              />
+              {isSubmitting && (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color="#1A3A73" />
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        )}
+      </ScreenContainer>
+    </>
   );
 }
 
@@ -360,4 +416,11 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
   },
+  loadingContainer: {
+    alignItems: 'center',
+    marginTop: 12,
+  },
 });
+
+// Default export for Expo Router
+export default ReportScreen;

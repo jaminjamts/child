@@ -5,7 +5,7 @@ type BodyTextProps = {
   center?: boolean;
 };
 
-export function Bodytext({ children, center = true }: BodyTextProps) {
+export function BodyText({ children, center = true }: BodyTextProps) {
   return (
     <Text style={[styles.title, center && styles.centered]}>{children}</Text>
   );

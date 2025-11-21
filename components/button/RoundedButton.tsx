@@ -8,6 +8,7 @@ interface RoundedButtonProps {
   color?: ButtonColor;
   size?: 'small' | 'medium' | 'large';
   style?: ViewStyle;
+  disabled?: boolean;
 }
 
 const colors: Record<ButtonColor, string> = {
@@ -24,6 +25,7 @@ export function RoundedButton({
   color = 'pink',
   size = 'medium',
   style,
+  disabled = false,
 }: RoundedButtonProps) {
   const sizeStyles = {
     small: styles.small,
@@ -37,10 +39,12 @@ export function RoundedButton({
         styles.button,
         sizeStyles[size],
         { backgroundColor: colors[color] },
+        disabled && styles.disabled,
         style,
       ]}
       onPress={onPress}
-      activeOpacity={0.7}>
+      activeOpacity={disabled ? 1 : 0.7}
+      disabled={disabled}>
       <Text style={[styles.text, size === 'large' && styles.largeText]}>
         {label}
       </Text>
@@ -73,5 +77,8 @@ const styles = StyleSheet.create({
   },
   largeText: {
     fontSize: 18,
+  },
+  disabled: {
+    opacity: 0.6,
   },
 });

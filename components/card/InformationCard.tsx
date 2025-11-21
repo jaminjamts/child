@@ -21,7 +21,7 @@ export function InformationCard({
           {description}
         </Text>
       </View>
-      <Image source={{ uri: imageUrl }} style={styles.image} />
+      {imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} />}
     </TouchableOpacity>
   );
 }
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 16,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 8,
     alignItems: 'center',
     gap: 12,
   },

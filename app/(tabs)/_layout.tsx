@@ -8,6 +8,7 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Hүүр',
+          headerShown: false,
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
               name={focused ? 'home-sharp' : 'home-outline'}
@@ -31,7 +32,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="dairy"
+        name="diary"
         options={{
           title: 'Тэмдэглэл',
           tabBarIcon: ({ focused, color }) => (

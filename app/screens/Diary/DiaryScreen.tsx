@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatBubble } from '../../../components/ChatBubble';
 import { Send, Star } from 'lucide-react-native';
 import { DiaryMessage } from '../../../types';
@@ -16,6 +18,8 @@ import { DiaryMessage } from '../../../types';
 type Message = DiaryMessage;
 
 export function DiaryScreen() {
+  const insets = useSafeAreaInsets();
+  const scrollViewRef = useRef<ScrollView>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -45,60 +49,87 @@ export function DiaryScreen() {
       };
       setMessages([...messages, newMessage]);
       setInputText('');
+      // Scroll to bottom after sending message
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
     }
   };
 
+  const handleInputFocus = () => {
+    // Scroll to bottom when input is focused
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 300);
+  };
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <View style={styles.headerBadge}>
+    <LinearGradient
+      colors={['#FFFFFF', '#F6E89A']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.gradient}>
+      <View style={[styles.headerBadge, { paddingTop: insets.top + 16 }]}>
         <Star size={20} color="#FFD700" fill="#FFD700" />
         <Text style={styles.headerText}>Сайн уу?</Text>
       </View>
 
-      <ScrollView
-        style={styles.messagesContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 20 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -(insets.top + 60) : -10}
       >
-        {messages.map((msg) => (
-          <ChatBubble
-            key={msg.id}
-            message={msg.text}
-            timestamp={msg.timestamp}
-            isOwn={msg.isOwn}
-          />
-        ))}
-      </ScrollView>
-
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Өнөөдөр хэр өдөр байвдаа..."
-          placeholderTextColor="#999"
-          value={inputText}
-          onChangeText={setInputText}
-          multiline
-        />
-        <TouchableOpacity
-          style={styles.sendButton}
-          onPress={handleSendMessage}
-          activeOpacity={0.7}
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.messagesContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 20 }}
+          keyboardShouldPersistTaps="handled"
+          onContentSizeChange={() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }}
         >
-          <Send size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+          {messages.map((msg) => (
+            <ChatBubble
+              key={msg.id}
+              message={msg.text}
+              timestamp={msg.timestamp}
+              isOwn={msg.isOwn}
+            />
+          ))}
+        </ScrollView>
+
+        <View style={[styles.inputContainer, { paddingBottom: insets.bottom }]}>
+          <TextInput
+            style={styles.input}
+            placeholder="Өнөөдөр хэр өдөр байвдаа..."
+            placeholderTextColor="#999"
+            value={inputText}
+            onChangeText={setInputText}
+            onFocus={handleInputFocus}
+            multiline
+            returnKeyType="send"
+            blurOnSubmit={false}
+          />
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={handleSendMessage}
+            activeOpacity={0.7}
+          >
+            <Send size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  gradient: {
     flex: 1,
-    backgroundColor: '#fff',
-    backgroundImage: 'linear-gradient(180deg, #FFFFFF 0%, #F6E89A 100%)',
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   headerBadge: {
     flexDirection: 'row',
@@ -122,7 +153,8 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingTop: 16,
+    paddingBottom: 16,
     gap: 12,
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
@@ -147,3 +179,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+// Default export for Expo Router
+export default DiaryScreen;

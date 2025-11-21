@@ -4,10 +4,14 @@ export type ButtonSize = 'small' | 'medium' | 'large';
 export type ReportStep = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface Article {
-  id: number;
+  id: string; // UUID from database
   title: string;
-  description: string;
-  imageUrl: string;
+  body: string;
+  thumbnail_url: string | null;
+  category: string | null;
+  author_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface DiaryMessage {

@@ -1,5 +1,6 @@
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ScreenContainerProps {
   children: React.ReactNode;
@@ -7,8 +8,10 @@ interface ScreenContainerProps {
 }
 
 export function ScreenContainer({ children, scrollable = false }: ScreenContainerProps) {
+  const insets = useSafeAreaInsets();
+
   const content = (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
       {children}
     </View>
   );
@@ -21,7 +24,7 @@ export function ScreenContainer({ children, scrollable = false }: ScreenContaine
       style={styles.gradient}>
       {scrollable ? (
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
           showsVerticalScrollIndicator={false}>
           {children}
         </ScrollView>
