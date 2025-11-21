@@ -1,7 +1,8 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { TitleText } from '../components/text/TitleText';
-import { InformationCard } from '../components/InformationCard';
+import { ScreenContainer } from '../../../components/ScreenContainer';
+import { TitleText } from '../../../components/text/TitleText';
+import { InformationCard } from '../../../components/card/InformationCard';
+import { Link, router } from 'expo-router';
 
 const articles = [
   {
@@ -41,14 +42,18 @@ export function InformationScreen() {
 
   return (
     <ScreenContainer scrollable>
-      <TitleText>Мэдээлэл</TitleText>
       {articles.map((article) => (
         <InformationCard
           key={article.id}
           title={article.title}
           description={article.description}
           imageUrl={article.imageUrl}
-          onPress={() => handleArticlePress(article.id)}
+          onPress={() => {
+            router.push({
+              pathname: '/screens/Information/InfoDetials',
+              params: { articleId: article.id.toString() },
+            });
+          }}
         />
       ))}
     </ScreenContainer>

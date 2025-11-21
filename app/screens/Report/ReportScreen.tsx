@@ -9,13 +9,13 @@ import {
   Modal,
   FlatList,
 } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { TitleText } from '../components/text/TitleText';
-import { RoundedButton } from '../components/button/RoundedButton';
-import { InputField } from '../components/InputField';
-import { BackButton } from '../components/button/BackButton';
-import { Picker } from '@react-native-picker/picker';
-import { ReportStep } from '../types';
+import { ScreenContainer } from '../../../components/ScreenContainer';
+import { TitleText } from '../../../components/text/TitleText';
+import { RoundedButton } from '../../../components/button/RoundedButton';
+import { InputField } from '../../../components/InputField';
+import { BackButton } from '../../../components/button/BackButton';
+import { ReportStep } from '../../../types';
+import { Bodytext } from '../../../components/text/BodyText';
 
 const genders = ['Эрэгтэй', 'Эмэгтэй'];
 
@@ -63,7 +63,7 @@ export function ReportScreen() {
         <View style={styles.stepContainer}>
           <TitleText>Та мэдээллэх үү?</TitleText>
           <RoundedButton
-            label="Мэдээллэх"
+            label="Мэдээлэх"
             onPress={handleNext}
             color="pink"
             size="large"
@@ -75,6 +75,10 @@ export function ReportScreen() {
       {step === 2 && (
         <View style={styles.stepContainer}>
           <TitleText>Сэтгэлийн байдал</TitleText>
+          <View style={styles.moodGuideContainer}>
+            <Bodytext center={false}>Хөнгөн 1</Bodytext>
+            <Bodytext center={false}>Хүнд 5</Bodytext>
+          </View>
           <View style={styles.moodButtonsContainer}>
             {[1, 2, 3, 4, 5].map((level) => (
               <RoundedButton
@@ -107,7 +111,7 @@ export function ReportScreen() {
           <TitleText>Ямар төрлийн булли?</TitleText>
           <View style={styles.buttonColumn}>
             <RoundedButton
-              label="Утгаар"
+              label="Утcаар"
               onPress={() => {
                 setActionType('verbal');
                 handleNext();
@@ -290,6 +294,11 @@ const styles = StyleSheet.create({
   buttonColumn: {
     gap: 16,
   },
+  moodGuideContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 24,
+  },
   moodButtonsContainer: {
     gap: 12,
   },
@@ -298,9 +307,9 @@ const styles = StyleSheet.create({
   },
   largeCircleButton: {
     alignSelf: 'center',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 250,
+    height: 250,
+    borderRadius: 999,
     justifyContent: 'center',
     alignItems: 'center',
   },

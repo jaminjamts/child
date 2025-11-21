@@ -9,9 +9,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { ChatBubble } from '../components/ChatBubble';
+import { ChatBubble } from '../../../components/ChatBubble';
 import { Send, Star } from 'lucide-react-native';
-import { DiaryMessage } from '../types';
+import { DiaryMessage } from '../../../types';
 
 type Message = DiaryMessage;
 

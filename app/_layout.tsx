@@ -33,12 +33,12 @@ export default function RootLayout() {
 
   return (
     <>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="report-flow" />
-        <Stack.Screen name="+not-found" />
+      <StatusBar style="inverted" />
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" options={{ title: 'Not Found' }} />
+        <Stack.Screen name="InfoDetails" />
       </Stack>
-      <StatusBar />
     </>
   );
 }
