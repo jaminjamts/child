@@ -7,11 +7,19 @@ interface ScreenContainerProps {
   scrollable?: boolean;
 }
 
-export function ScreenContainer({ children, scrollable = false }: ScreenContainerProps) {
+export function ScreenContainer({
+  children,
+  scrollable = false,
+}: ScreenContainerProps) {
   const insets = useSafeAreaInsets();
 
   const content = (
-    <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
+    <View
+      style={[
+        styles.container,
+        // { paddingTop: insets.top + 20 }
+      ]}
+    >
       {children}
     </View>
   );
@@ -21,11 +29,16 @@ export function ScreenContainer({ children, scrollable = false }: ScreenContaine
       colors={['#FFFFFF', '#F6E89A']}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
-      style={styles.gradient}>
+      style={styles.gradient}
+    >
       {scrollable ? (
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
-          showsVerticalScrollIndicator={false}>
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingTop: insets.top + 20 },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
           {children}
         </ScrollView>
       ) : (

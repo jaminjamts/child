@@ -34,7 +34,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="diary"
         options={{
-          title: 'Тэмдэглэл',
+          title: 'Өдрийн тэмдэглэл',
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
               name={focused ? 'book' : 'book-outline'}
