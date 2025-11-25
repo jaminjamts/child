@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { ScreenContainer } from '../../../components/ScreenContainer';
-import { TitleText } from '../../../components/text/TitleText';
-import { InformationCard } from '../../../components/card/InformationCard';
+import { InformationCard } from '../../../components/cards/InformationCard';
 import { router } from 'expo-router';
 import { getArticles } from '../../../lib/supabaseService';
 import { Article } from '../../../types';

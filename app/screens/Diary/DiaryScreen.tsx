@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Calendar } from 'react-native-calendars';
 import { ChatBubble } from '../../../components/ChatBubble';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Send, Star } from 'lucide-react-native';
@@ -22,6 +21,7 @@ type Message = DiaryMessage;
 
 export function DiaryScreen() {
   const insets = useSafeAreaInsets();
+
   const scrollViewRef = useRef<ScrollView>(null);
   const [inputText, setInputText] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState(
@@ -111,15 +111,12 @@ export function DiaryScreen() {
             }}
           >
             <View>
-              <Calendar
-                onDayPress={(day) => {
-                  setSelectedDate(day.dateString);
-                  loadMessagesForDate(day.dateString);
-                }}
-                markedDates={{
-                  [selectedDate]: { selected: true, selectedColor: '#A8D8C5' },
-                }}
-              />
+              <Suspense fallback={<Text>Loading...</Text>}>
+                {/* <Calendar
+                  onDayPress={handleDayPress}
+                  markedDates={markedDates}
+                /> */}
+              </Suspense>
             </View>
             {messages.map((msg) => (
               <ChatBubble

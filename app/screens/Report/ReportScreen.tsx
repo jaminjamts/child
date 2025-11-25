@@ -11,12 +11,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { ScreenContainer } from '../../../components/ScreenContainer';
-import { TitleText } from '../../../components/text/TitleText';
-import { RoundedButton } from '../../../components/button/RoundedButton';
+import { TitleText } from '../../../components/texts/TitleText';
+import { RoundedButton } from '../../../components/buttons/RoundedButton';
 import { InputField } from '../../../components/InputField';
-import { FixedBackButton } from '../../../components/button/FixedBackButton';
+import { FixedBackButton } from '../../../components/buttons/FixedBackButton';
 import { ReportStep, ReportData } from '../../../types';
-import { BodyText } from '../../../components/text/BodyText';
+import { BodyText } from '../../../components/texts/BodyText';
 import { saveReport } from '../../../lib/supabaseService';
 
 const genders = ['Эрэгтэй', 'Эмэгтэй'];
@@ -109,7 +109,6 @@ export function ReportScreen() {
     <>
       {step > 1 && <FixedBackButton onPress={handleBack} />}
       <ScreenContainer scrollable>
-
         {step === 1 && (
           <View style={styles.stepContainer}>
             <TitleText>Та мэдээллэх үү?</TitleText>
@@ -143,12 +142,12 @@ export function ReportScreen() {
                     level === 1
                       ? 'mint'
                       : level === 2
-                        ? 'blue'
-                        : level === 3
-                          ? 'yellow'
-                          : level === 4
-                            ? 'pink'
-                            : 'darkBlue'
+                      ? 'blue'
+                      : level === 3
+                      ? 'yellow'
+                      : level === 4
+                      ? 'pink'
+                      : 'darkBlue'
                   }
                   style={styles.moodButton}
                 />
@@ -266,7 +265,10 @@ export function ReportScreen() {
           <View style={styles.stepContainer}>
             <TitleText>Хувийн мэдээлэл</TitleText>
             <ScrollView showsVerticalScrollIndicator={false}>
-              <Pressable style={styles.inputBox} onPress={() => setVisible(true)}>
+              <Pressable
+                style={styles.inputBox}
+                onPress={() => setVisible(true)}
+              >
                 <Text style={styles.inputText}>
                   {gender ? gender : 'Хүйс сонгох'}
                 </Text>

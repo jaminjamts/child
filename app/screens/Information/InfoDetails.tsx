@@ -1,9 +1,15 @@
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { ScreenContainer } from '../../../components/ScreenContainer';
-import { TitleText } from '../../../components/text/TitleText';
-import { FixedBackButton } from '../../../components/button/FixedBackButton';
+import { TitleText } from '../../../components/texts/TitleText';
+import { FixedBackButton } from '../../../components/buttons/FixedBackButton';
 import { getArticleById } from '../../../lib/supabaseService';
 import { Article } from '../../../types';
 import { Image } from 'react-native';
@@ -73,9 +79,7 @@ const InfoDetails = () => {
       <ScreenContainer scrollable={false}>
         <FixedBackButton onPress={handleBack} />
         <View style={styles.centerContainer}>
-          <Text style={styles.errorText}>
-            {error || 'Мэдээлэл олдсонгүй'}
-          </Text>
+          <Text style={styles.errorText}>{error || 'Мэдээлэл олдсонгүй'}</Text>
         </View>
       </ScreenContainer>
     );
@@ -94,7 +98,8 @@ const InfoDetails = () => {
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16}
-          contentContainerStyle={styles.scrollContent}>
+          contentContainerStyle={styles.scrollContent}
+        >
           {article.thumbnail_url && (
             <Image
               source={{ uri: article.thumbnail_url }}
@@ -112,13 +117,38 @@ const InfoDetails = () => {
               source={{ html: article.body }}
               baseStyle={styles.htmlBase}
               tagsStyles={{
-                p: { marginBottom: 12, fontSize: 16, lineHeight: 24, color: '#333' },
-                h1: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, color: '#1A3A73' },
-                h2: { fontSize: 20, fontWeight: 'bold', marginBottom: 14, color: '#1A3A73' },
-                h3: { fontSize: 18, fontWeight: 'bold', marginBottom: 12, color: '#1A3A73' },
+                p: {
+                  marginBottom: 12,
+                  fontSize: 16,
+                  lineHeight: 24,
+                  color: '#333',
+                },
+                h1: {
+                  fontSize: 24,
+                  fontWeight: 'bold',
+                  marginBottom: 16,
+                  color: '#1A3A73',
+                },
+                h2: {
+                  fontSize: 20,
+                  fontWeight: 'bold',
+                  marginBottom: 14,
+                  color: '#1A3A73',
+                },
+                h3: {
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  marginBottom: 12,
+                  color: '#1A3A73',
+                },
                 ul: { marginBottom: 12 },
                 ol: { marginBottom: 12 },
-                li: { marginBottom: 8, fontSize: 16, lineHeight: 24, color: '#333' },
+                li: {
+                  marginBottom: 8,
+                  fontSize: 16,
+                  lineHeight: 24,
+                  color: '#333',
+                },
                 strong: { fontWeight: 'bold', color: '#1A3A73' },
                 em: { fontStyle: 'italic' },
                 a: { color: '#1A3A73', textDecorationLine: 'underline' },
@@ -192,4 +222,3 @@ const styles = StyleSheet.create({
 });
 
 export default InfoDetails;
-

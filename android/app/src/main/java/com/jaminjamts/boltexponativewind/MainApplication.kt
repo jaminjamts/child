@@ -1,4 +1,4 @@
-package com.anonymous.boltexponativewind
+package com.jaminjamts.boltexponativewind
 
 import android.app.Application
 import android.content.res.Configuration

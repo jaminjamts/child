@@ -14,12 +14,7 @@ export function ScreenContainer({
   const insets = useSafeAreaInsets();
 
   const content = (
-    <View
-      style={[
-        styles.container,
-        // { paddingTop: insets.top + 20 }
-      ]}
-    >
+    <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
       {children}
     </View>
   );
