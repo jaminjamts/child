@@ -4,8 +4,15 @@ import {
   View,
   ScrollView,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import { useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { ScreenContainer } from '../../../components/ScreenContainer';
 import { TitleText } from '../../../components/texts/TitleText';
@@ -23,6 +30,7 @@ const InfoDetails = () => {
   const scrollViewRef = useRef<ScrollView>(null);
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scrollOffset, setScrollOffset] = useState(0);
 
@@ -53,6 +61,14 @@ const InfoDetails = () => {
     }
   };
 
+  const onRefresh = useCallback(async () => {
+    console.log('a');
+
+    setRefreshing(true);
+    await loadArticle();
+    setRefreshing(false);
+  }, [articleId]);
+
   const handleBack = () => {
     router.back();
   };
@@ -62,7 +78,7 @@ const InfoDetails = () => {
     setScrollOffset(offsetY);
   };
 
-  if (loading) {
+  if (loading && !refreshing) {
     return (
       <ScreenContainer scrollable={false}>
         <FixedBackButton onPress={handleBack} />
@@ -99,6 +115,9 @@ const InfoDetails = () => {
           onScroll={handleScroll}
           scrollEventThrottle={16}
           contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         >
           {article.thumbnail_url && (
             <Image
@@ -165,7 +184,9 @@ const InfoDetails = () => {
             />
           </View>
           <Text style={styles.date}>
-            {new Date(article.created_at).toLocaleDateString('mn-MN')}
+            {article.created_at
+              ? new Date(article.created_at).toLocaleDateString('mn-MN')
+              : ''}
           </Text>
         </ScrollView>
       </ScreenContainer>

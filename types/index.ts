@@ -14,12 +14,13 @@ export interface Article {
   updated_at: string;
 }
 
-export interface DiaryMessage {
+export type DiaryEntry = {
   id: string;
-  text: string;
+  title: string;
+  content: string;
+  date: string;
   timestamp: string;
-  isOwn: boolean;
-}
+};
 
 export interface ReportData {
   moodLevel: number | null;

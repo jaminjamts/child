@@ -1,59 +1,36 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { DiaryEntry } from '../types';
+import { formattedDate } from '../utils/formatedDate';
 
-interface ChatBubbleProps {
-  message: string;
-  timestamp: string;
-  isOwn?: boolean;
-}
-
-export function ChatBubble({ message, timestamp, isOwn = true }: ChatBubbleProps) {
+export function ChatBubble({ title, content, date, timestamp }: DiaryEntry) {
   return (
-    <View style={[styles.container, isOwn && styles.ownContainer]}>
-      <View
-        style={[
-          styles.bubble,
-          isOwn ? styles.ownBubble : styles.otherBubble,
-        ]}>
-        <Text style={[styles.text, isOwn && styles.ownText]}>
-          {message}
-        </Text>
+    <>
+      <View style={styles.card}>
+        <Text style={styles.cardBody}>{title}</Text>
+        <Text style={styles.cardBody}>{content}</Text>
+
+        <Text style={styles.sectionTitle}>{formattedDate(new Date(date))}</Text>
       </View>
-      <Text style={styles.timestamp}>{timestamp}</Text>
-    </View>
+    </>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-    alignItems: 'flex-start',
+  sectionTitle: {
+    fontWeight: '600',
+    marginBottom: 8,
+    marginTop: 16,
+    color: '#1A3A73',
   },
-  ownContainer: {
-    alignItems: 'flex-end',
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  bubble: {
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    maxWidth: '80%',
-  },
-  ownBubble: {
-    backgroundColor: '#A8D8C5',
-  },
-  otherBubble: {
-    backgroundColor: '#E9E9E9',
-  },
-  text: {
-    fontSize: 16,
-    color: '#333',
-  },
-  ownText: {
-    color: '#fff',
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 4,
-    marginHorizontal: 12,
-  },
+  cardBody: { color: '#333', fontSize: 14, lineHeight: 20 },
 });

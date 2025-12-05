@@ -3,38 +3,30 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   ScrollView,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatBubble } from '../../../components/ChatBubble';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Send, Star } from 'lucide-react-native';
-import { DiaryMessage } from '../../../types';
+import { PlusIcon, Send, Star } from 'lucide-react-native';
 import { ScreenContainer } from '../../../components/ScreenContainer';
-
-type Message = DiaryMessage;
+import EntryModal from '../Modals/EntryModal';
+import { DiaryEntry } from '../../../types';
 
 export function DiaryScreen() {
   const insets = useSafeAreaInsets();
 
   const scrollViewRef = useRef<ScrollView>(null);
-  const [inputText, setInputText] = useState<string>('');
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
-  const [messages, setMessages] = useState<Message[]>([]);
-
+  const [open, setOpen] = useState(false);
+  const [dairy, setDairy] = useState<DiaryEntry[]>([]);
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem('diaryMessages');
 
       if (value !== null) {
-        setMessages(JSON.parse(value));
+        setDairy(JSON.parse(value));
       }
     } catch (e) {
       console.error('Failed to load messages.', e);
@@ -45,47 +37,18 @@ export function DiaryScreen() {
     getData();
   }, []);
 
-  const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
-
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      text: inputText,
-      timestamp: new Date().toLocaleTimeString('mn-MN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      isOwn: true,
-    };
-
-    const key = `diaryMessages-${selectedDate}`;
-    const existing = await AsyncStorage.getItem(key);
-    const messagesForDate = existing ? JSON.parse(existing) : [];
-
-    const updatedMessages = [...messagesForDate, newMessage];
-    await AsyncStorage.setItem(key, JSON.stringify(updatedMessages));
-
-    setMessages(updatedMessages);
-    setInputText('');
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 100);
+  const deleteAsyncStroge = async () => {
+    try {
+      await AsyncStorage.removeItem('diaryMessages');
+      console.log('AsyncStorage item deleted successfully');
+    } catch (error) {
+      console.error('Error deleting AsyncStorage item:', error);
+    }
   };
 
-  const handleInputFocus = () => {
-    // Scroll to bottom when input is focused
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 300);
-  };
-
-  const loadMessagesForDate = async (date: string) => {
-    const value = await AsyncStorage.getItem(`diaryMessages-${date}`);
-    setMessages(value ? JSON.parse(value) : []);
-  };
+  useEffect(() => {
+    getData();
+  }, [dairy]);
 
   return (
     <LinearGradient
@@ -95,59 +58,39 @@ export function DiaryScreen() {
       style={styles.gradient}
     >
       <ScreenContainer>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardAvoidingView}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? -insets.top : -10}
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.messagesContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          onContentSizeChange={() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }}
         >
-          <ScrollView
-            ref={scrollViewRef}
-            style={styles.messagesContainer}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 20 }}
-            keyboardShouldPersistTaps="handled"
-            onContentSizeChange={() => {
-              scrollViewRef.current?.scrollToEnd({ animated: true });
-            }}
-          >
-            <View>
-              <Suspense fallback={<Text>Loading...</Text>}>
-                {/* <Calendar
-                  onDayPress={handleDayPress}
-                  markedDates={markedDates}
-                /> */}
-              </Suspense>
-            </View>
-            {messages.map((msg) => (
-              <ChatBubble
-                key={msg.id}
-                message={msg.text}
-                timestamp={msg.timestamp}
-                isOwn={msg.isOwn}
-              />
-            ))}
-          </ScrollView>
-
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Өнөөдөр хэр өдөр байвдаа..."
-              placeholderTextColor="#999"
-              value={inputText}
-              onChangeText={setInputText}
-              onFocus={handleInputFocus}
-              multiline
-              returnKeyType="send"
-            />
-            <TouchableOpacity
-              style={styles.sendButton}
-              onPress={handleSendMessage}
-              activeOpacity={0.7}
-            >
-              <Send size={24} color="#fff" />
-            </TouchableOpacity>
+          <View>
+            <Suspense fallback={<Text>Loading...</Text>}></Suspense>
           </View>
-        </KeyboardAvoidingView>
+          {/* <View>
+            <Button onPress={() => deleteAsyncStroge()} title="Clear" />
+          </View> */}
+
+          {dairy.map((data) => (
+            <ChatBubble
+              id={data.id}
+              title={data.title}
+              content={data.content}
+              date={data.date}
+              timestamp={data.timestamp}
+            />
+          ))}
+        </ScrollView>
+        <TouchableOpacity
+          onPress={() => setOpen(true)}
+          style={styles.inputContainer}
+        >
+          <PlusIcon />
+        </TouchableOpacity>
+        <EntryModal visible={open} onClose={() => setOpen(false)} />
       </ScreenContainer>
     </LinearGradient>
   );
@@ -170,11 +113,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inputContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 16,
-    gap: 12,
+    position: 'absolute',
+    bottom: 35,
+    alignSelf: 'center',
+    backgroundColor: '#888',
+    width: 65,
+    height: 65,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   input: {
     flex: 1,
@@ -183,7 +130,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#1A3A73',
+    color: '#fff',
     maxHeight: 100,
   },
   sendButton: {
@@ -196,5 +143,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// Default export for Expo Router
 export default DiaryScreen;
