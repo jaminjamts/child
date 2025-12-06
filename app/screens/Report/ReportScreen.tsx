@@ -18,6 +18,7 @@ import { FixedBackButton } from '../../../components/buttons/FixedBackButton';
 import { ReportStep, ReportData } from '../../../types';
 import { BodyText } from '../../../components/texts/BodyText';
 import { saveReport } from '../../../lib/supabaseService';
+import { WaveButton } from '../../../components/buttons/WaveButton';
 
 const genders = ['Эрэгтэй', 'Эмэгтэй'];
 
@@ -43,6 +44,11 @@ export function ReportScreen() {
   };
 
   const handleNext = () => {
+    if (step === 3 && role === 'reporter') {
+      setStep(5 as Step);
+      return;
+    }
+
     if (step < 6) {
       setStep((step + 1) as Step);
     } else {
@@ -112,11 +118,11 @@ export function ReportScreen() {
         {step === 1 && (
           <View style={styles.stepContainer}>
             <TitleText>Та мэдээллэх үү?</TitleText>
-            <RoundedButton
+            <WaveButton
               label="Мэдээлэх"
               onPress={handleNext}
+              size={250}
               color="pink"
-              size="large"
               style={styles.largeCircleButton}
             />
           </View>
@@ -124,7 +130,75 @@ export function ReportScreen() {
 
         {step === 2 && (
           <View style={styles.stepContainer}>
-            <TitleText>Сэтгэлийн байдал</TitleText>
+            <TitleText>Та хэн бэ?</TitleText>
+            <View style={styles.buttonColumn}>
+              <RoundedButton
+                label="Хүүхэд"
+                onPress={() => {
+                  setRole('child');
+                  handleNext();
+                }}
+                color="blue"
+                size="large"
+              />
+              <RoundedButton
+                label="Мэдээлэгч"
+                onPress={() => {
+                  setRole('reporter');
+                  handleNext();
+                }}
+                color="mint"
+                size="large"
+              />
+            </View>
+          </View>
+        )}
+        {step === 3 && (
+          <View style={styles.stepContainer}>
+            <TitleText>Дээрхлэлтийн хэлбэр?</TitleText>
+            <View style={styles.buttonColumn}>
+              <RoundedButton
+                label="Үгээр"
+                onPress={() => {
+                  setActionType('Үгээр');
+                  handleNext();
+                }}
+                color="pink"
+                size="large"
+              />
+              <RoundedButton
+                label="Биед халдах"
+                onPress={() => {
+                  setActionType('Биед халдах');
+                  handleNext();
+                }}
+                color="mint"
+                size="large"
+              />
+              <RoundedButton
+                label="Цахим"
+                onPress={() => {
+                  setActionType('Цахим');
+                  handleNext();
+                }}
+                color="blue"
+                size="large"
+              />
+              <RoundedButton
+                label="Сэтгэл зүйн"
+                onPress={() => {
+                  setActionType('Сэтгэл зүйн');
+                  handleNext();
+                }}
+                color="darkBlue"
+                size="large"
+              />
+            </View>
+          </View>
+        )}
+        {step === 4 && (
+          <View style={styles.stepContainer}>
+            <TitleText>Сэтгэл санаа үнэлнэ үү?</TitleText>
             <View style={styles.moodGuideContainer}>
               <BodyText center={false}>Хөнгөн 1</BodyText>
               <BodyText center={false}>Хүнд 5</BodyText>
@@ -155,43 +229,7 @@ export function ReportScreen() {
             </View>
           </View>
         )}
-
-        {step === 3 && (
-          <View style={styles.stepContainer}>
-            <TitleText>Ямар төрлийн булли?</TitleText>
-            <View style={styles.buttonColumn}>
-              <RoundedButton
-                label="Утcаар"
-                onPress={() => {
-                  setActionType('verbal');
-                  handleNext();
-                }}
-                color="pink"
-                size="large"
-              />
-              <RoundedButton
-                label="Биед халдах"
-                onPress={() => {
-                  setActionType('physical');
-                  handleNext();
-                }}
-                color="mint"
-                size="large"
-              />
-              <RoundedButton
-                label="Цахим"
-                onPress={() => {
-                  setActionType('cyber');
-                  handleNext();
-                }}
-                color="blue"
-                size="large"
-              />
-            </View>
-          </View>
-        )}
-
-        {step === 4 && (
+        {step === 5 && (
           <View style={styles.stepContainer}>
             <TitleText>Хаана болсон вэ?</TitleText>
             <View style={styles.buttonColumn}>
@@ -204,19 +242,11 @@ export function ReportScreen() {
                 color="yellow"
                 size="large"
               />
-              <RoundedButton
-                label="Гудамж"
-                onPress={() => {
-                  setLocation('street');
-                  handleNext();
-                }}
-                color="pink"
-                size="large"
-              />
+
               <RoundedButton
                 label="Гэр бүл"
                 onPress={() => {
-                  setLocation('family');
+                  setLocation('Гэр бүл');
                   handleNext();
                 }}
                 color="blue"
@@ -226,32 +256,6 @@ export function ReportScreen() {
                 label="Олон нийтийн газар"
                 onPress={() => {
                   setLocation('public');
-                  handleNext();
-                }}
-                color="mint"
-                size="large"
-              />
-            </View>
-          </View>
-        )}
-
-        {step === 5 && (
-          <View style={styles.stepContainer}>
-            <TitleText>Та хэн бэ?</TitleText>
-            <View style={styles.buttonColumn}>
-              <RoundedButton
-                label="Хүүхэд"
-                onPress={() => {
-                  setRole('child');
-                  handleNext();
-                }}
-                color="blue"
-                size="large"
-              />
-              <RoundedButton
-                label="Мэдээлэгч"
-                onPress={() => {
-                  setRole('reporter');
                   handleNext();
                 }}
                 color="mint"
@@ -317,7 +321,7 @@ export function ReportScreen() {
 
               <InputField
                 label="Утас"
-                placeholder="Утасны дугаар"
+                placeholder="Утасны дугаар /Заавал биш/"
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"

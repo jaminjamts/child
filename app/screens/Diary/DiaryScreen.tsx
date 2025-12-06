@@ -75,13 +75,15 @@ export function DiaryScreen() {
           </View> */}
 
           {dairy.map((data) => (
-            <ChatBubble
-              id={data.id}
-              title={data.title}
-              content={data.content}
-              date={data.date}
-              timestamp={data.timestamp}
-            />
+            <View key={data.id}>
+              <ChatBubble
+                id={data.id}
+                title={data.title}
+                content={data.content}
+                date={data.date}
+                timestamp={data.timestamp}
+              />
+            </View>
           ))}
         </ScrollView>
         <TouchableOpacity

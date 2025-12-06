@@ -7,12 +7,18 @@ interface IconButtonProps {
   style?: ViewStyle;
 }
 
-export function IconButton({ icon, onPress, size = 40, style }: IconButtonProps) {
+export function IconButton({
+  icon,
+  onPress,
+  size = 40,
+  style,
+}: IconButtonProps) {
   return (
     <TouchableOpacity
       style={[styles.button, { width: size, height: size }, style]}
       onPress={onPress}
-      activeOpacity={0.7}>
+      activeOpacity={0.7}
+    >
       {icon}
     </TouchableOpacity>
   );
