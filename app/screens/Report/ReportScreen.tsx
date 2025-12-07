@@ -117,7 +117,7 @@ export function ReportScreen() {
   return (
     <>
       {step > 1 && <FixedBackButton onPress={handleBack} />}
-      <ScreenContainer scrollable>
+      <ScreenContainer>
         {step === 1 && (
           <View style={styles.stepContainer}>
             <TitleText>Та мэдээллэх үү?</TitleText>

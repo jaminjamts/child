@@ -61,7 +61,9 @@ export default function EntryModal({ visible, onClose }: EntryModalProps) {
           <Text style={styles.date}>{formattedDate(new Date())}</Text>
 
           <TouchableOpacity onPress={handleSave}>
-            <Text style={styles.done}>Болсон</Text>
+            <Text style={styles.done}>
+              {title || content ? 'Хадгалах' : 'Гарах'}
+            </Text>
           </TouchableOpacity>
         </View>
 

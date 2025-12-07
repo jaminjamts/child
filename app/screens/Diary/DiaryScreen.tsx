@@ -28,6 +28,7 @@ export function DiaryScreen() {
       if (value !== null) {
         setDairy(JSON.parse(value));
       }
+      setDairy((prev) => [...prev].sort((a, b) => Number(b.id) - Number(a.id)));
     } catch (e) {
       console.error('Failed to load messages.', e);
     }
@@ -63,9 +64,6 @@ export function DiaryScreen() {
           style={styles.messagesContainer}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          onContentSizeChange={() => {
-            scrollViewRef.current?.scrollToEnd({ animated: true });
-          }}
         >
           <View>
             <Suspense fallback={<Text>Loading...</Text>}></Suspense>
