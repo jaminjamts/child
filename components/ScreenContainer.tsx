@@ -1,15 +1,22 @@
-import { View, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  RefreshControlProps,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ScreenContainerProps {
   children: React.ReactNode;
   scrollable?: boolean;
+  refreshControl?: React.ReactElement<RefreshControlProps>;
 }
 
 export function ScreenContainer({
   children,
   scrollable = false,
+  refreshControl,
 }: ScreenContainerProps) {
   const insets = useSafeAreaInsets();
 
@@ -33,6 +40,7 @@ export function ScreenContainer({
             { paddingTop: insets.top + 20 },
           ]}
           showsVerticalScrollIndicator={false}
+          refreshControl={refreshControl}
         >
           {children}
         </ScrollView>

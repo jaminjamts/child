@@ -65,11 +65,14 @@ export function ReportScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!moodLevel || !actionType || !location || !role) {
+    if (!gender || !actionType || !location || !role) {
       Alert.alert('Алдаа', 'Бүх талбарыг бөглөнө үү');
       return;
     }
-
+    if (phone && phone.length != 8) {
+      Alert.alert('Утасны дугаараа шалгана уу');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const reportData: ReportData = {

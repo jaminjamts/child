@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  Text,
+  RefreshControl,
+} from 'react-native';
 import { ScreenContainer } from '../../../components/ScreenContainer';
 import { InformationCard } from '../../../components/cards/InformationCard';
 import { router } from 'expo-router';
@@ -10,6 +16,7 @@ export function InformationScreen() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadArticles();
@@ -27,6 +34,12 @@ export function InformationScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadArticles();
+    setRefreshing(false);
   };
 
   // Helper function to get description from HTML body (strip HTML tags and get first 100 characters)
@@ -78,7 +91,12 @@ export function InformationScreen() {
   }
 
   return (
-    <ScreenContainer scrollable>
+    <ScreenContainer
+      scrollable
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {articles.map((article) => (
         <InformationCard
           key={article.id}
